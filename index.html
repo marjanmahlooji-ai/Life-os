@@ -57,7 +57,23 @@ svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stro
 .date{color:var(--muted);font-size:13px}
 .greet{font-size:clamp(22px,4.6vw,30px);font-weight:800;margin:2px 0 0;text-wrap:balance}
 .sync{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--sage)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--sage)}
+.dot.busy{background:#D9A441}
+.dot.off{background:#B8A27A}
+.dot.err{background:#C4574D;box-shadow:0 0 0 3px rgba(196,87,77,.22)}
+.sync{padding:3px 10px;border-radius:999px;font-weight:600;transition:background .2s,color .2s}
+.sync[data-st="ok"]{background:var(--sage-tint);color:var(--sage-strong)}
+.sync[data-st="busy"]{background:#F6EBCF;color:#7A5410}
+.sync[data-st="off"]{background:#F1E6D0;color:#7A5410}
+.sync[data-st="err"]{background:#C4574D;color:#fff;animation:syncpulse 1.2s ease-in-out 3}
+.sync[data-st="err"] .dot{background:#fff;box-shadow:none}
+@keyframes syncpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+#sync-bar.warn{background:#B7791F}
+#sync-bar b{display:block;font-size:14px}
+#sync-bar{position:fixed;top:0;left:0;right:0;z-index:70;background:#C4574D;color:#fff;font-size:13px;line-height:1.7;padding:max(10px,env(safe-area-inset-top)) 16px 10px;box-shadow:0 4px 14px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:space-between;gap:12px;direction:rtl}
+#sync-bar[hidden]{display:none}
+#sync-bar #sync-x{border:0;font-size:24px;line-height:1;padding:0 4px}
+#sync-bar button{flex:none;border:1px solid rgba(255,255,255,.7);background:transparent;color:#fff;border-radius:999px;padding:3px 12px;font-size:12px}
 .tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .tile{border-radius:var(--r);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;min-width:0}
 .tile b{display:block;font-size:clamp(24px,5vw,32px);font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
@@ -1062,7 +1078,7 @@ body.cook-theme{background:var(--bg);min-height:100vh}
           <h1 class="greet" id="greet">سلام!</h1>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <span class="ver" style="font-size:10px;color:var(--muted)">نسخه‌ی ۷٫۲</span><span class="sync" id="sync"><span class="dot"></span><span id="sync-t">در حال بارگذاری</span></span>
+          <span class="ver" style="font-size:10px;color:var(--muted)">نسخه‌ی ۷٫۴</span><span class="sync" id="sync"><span class="dot"></span><span id="sync-t">در حال بارگذاری</span></span>
           <button class="icon-btn" id="btn-settings" aria-label="تنظیمات"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
         </div>
       </header>
@@ -1261,7 +1277,33 @@ const STATIC = !GAS_RUN;
 const HAS_GAS = !!GAS_RUN || !!API;
 let pending = 0, online = false;
 
-function setSync(t){ $("#sync-t").textContent = t; }
+let failedN = 0, lastLoadTry = 0, barX = false;
+function lastOkText(){
+  let t = 0; try{ t = Number(localStorage.getItem("lifeos-lastok")) || 0; }catch(e){}
+  if(!t) return "";
+  const d = new Date(t), now = new Date();
+  const hm = d.toLocaleTimeString("fa-IR", {hour:"2-digit", minute:"2-digit"});
+  if(d.toDateString() === now.toDateString()) return "امروز " + hm;
+  return d.toLocaleDateString("fa-IR-u-ca-persian", {month:"long", day:"numeric"}) + " " + hm;
+}
+function markOk(){ try{ localStorage.setItem("lifeos-lastok", String(Date.now())); }catch(e){} failedN = 0; barX = false; syncBar(); }
+function syncBar(why, kind){
+  let b = document.getElementById("sync-bar");
+  if(barX || (!failedN && !why)){ if(b) b.hidden = true; return; }
+  if(!b){ b = document.createElement("div"); b.id = "sync-bar"; b.setAttribute("role","alert"); document.body.appendChild(b); }
+  const lo = lastOkText();
+  b.className = kind === "warn" ? "warn" : "";
+  const head = kind === "warn" ? "⚠ آفلاین هستی" : "⚠ ذخیره نشد";
+  b.innerHTML = "<span><b>" + head + "</b>" + (why || (failedN + " تغییر در شیت ذخیره نشد و برگردانده شد.")) + (lo ? " آخرین همگام‌سازی موفق: " + lo : "") + "</span><button type=\"button\" id=\"sync-retry\">تلاش دوباره</button><button type=\"button\" id=\"sync-x\" aria-label=\"بستن\">×</button>";
+  b.hidden = false;
+  document.getElementById("sync-retry").onclick = () => { load(); };
+  document.getElementById("sync-x").onclick = () => { barX = true; b.hidden = true; };
+}
+function setSync(t, st){
+  $("#sync-t").textContent = t;
+  const sy = $("#sync"); if(sy) sy.setAttribute("data-st", st || "");
+  const d = document.querySelector("#sync .dot"); if(d) d.className = "dot " + (st || "");
+}
 const IDB_STORE = "kv";
 let idbOK = true, idbTimer = 0, idbWarned = false;
 function idbOpen(){ return new Promise((res, rej) => { try{ const r = indexedDB.open("lifeos", 1); r.onupgradeneeded = () => { r.result.createObjectStore(IDB_STORE); }; r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }catch(e){ rej(e); } }); }
@@ -1299,25 +1341,37 @@ function call(fn, ...args){
 /* every change: update the screen first, then write to the sheet; undo on failure */
 function sync(fn, args, undo){
   persist();
-  if(!HAS_GAS){ setSync("پیش‌نمایش؛ به شیت وصل نیست"); return; }
-  pending++; setSync("در حال ذخیره در شیت…");
+  if(!HAS_GAS){ setSync("پیش‌نمایش؛ به شیت وصل نیست", "off"); return; }
+  pending++; setSync("در حال ذخیره در شیت…", "busy");
   call(fn, ...args).then(() => {
-    pending--; if(!pending) setSync("ذخیره شد در گوگل شیت");
-  }).catch(() => {
+    pending--; if(!pending){ setSync("ذخیره شد در گوگل شیت", "ok"); markOk(); }
+  }).catch(err => {
     pending--; if(undo){ undo(); persist(); render(); }
-    setSync("ذخیره نشد"); toast("اتصال برقرار نشد؛ تغییر برگردانده شد");
+    failedN++; barX = false; setSync("ذخیره نشد", "err"); try{ if(navigator.vibrate) navigator.vibrate([150,80,150]); }catch(e){}
+    const bad = err && err.message === "auth";
+    syncBar(bad ? "کلید اتصال معتبر نیست؛ تغییر ذخیره نشد." : "");
+    toast(bad ? "کلید اتصال رد شد" : "اتصال برقرار نشد؛ تغییر برگردانده شد");
   });
 }
 async function load(){
-  if(!HAS_GAS){ setSync("پیش‌نمایش؛ به شیت وصل نیست"); return; }
-  setSync("در حال خواندن از شیت…");
+  if(!HAS_GAS){ setSync("پیش‌نمایش؛ به شیت وصل نیست", "off"); return; }
+  lastLoadTry = Date.now(); setSync("در حال خواندن از شیت…", "busy");
   try{
     const r = await call("getState", CAL.year);
     S = {v:1, name:r.name, habits:r.habits, log:r.log||{}, mood:r.mood||{}, url:r.url, books:r.books||[], bnotes:r.bnotes||[], sessions:r.sessions||[], chapters:r.chapters||[], prefs:r.prefs||{}, tx:r.tx||[], budgets:r.budgets||[], fgoals:r.fgoals||[], lessons:r.lessons||[], practices:r.practices||[], csteps:r.csteps||[], dishes:r.dishes||[], runs:r.runs||[], heirs:r.heirs||[], plans:r.plans||[], miles:r.miles||[], events:r.events||[], cycles:r.cycles||[], journals:r.journals||[], knotes:r.knotes||[], stickers:r.stickers||[]};
     splitPaused(); calMigrate(); lockCheck();
-    persist(); online = true; render(); renderLib(); renderFin(); renderCook(); renderLife(); setSync("همگام با گوگل شیت");
-  }catch(e){ setSync("شیت در دسترس نیست؛ نسخه‌ی ذخیره‌شده نمایش داده می‌شود"); }
+    persist(); online = true; render(); renderLib(); renderFin(); renderCook(); renderLife(); setSync("همگام با گوگل شیت", "ok"); markOk();
+  }catch(e){
+    const bad = e && e.message === "auth";
+    setSync(bad ? "کلید اتصال معتبر نیست" : "آفلاین؛ نسخه‌ی ذخیره‌شده نمایش داده می‌شود", bad ? "err" : "off");
+    if(bad) syncBar("کلید اتصال معتبر نیست؛ داده‌ها از شیت خوانده نشد.");
+    else syncBar(" می‌توانی داده‌های ذخیره‌شده را ببینی، ولی تغییرها در شیت ذخیره نمی‌شود.", "warn");
+  }
 }
+
+window.addEventListener("online", () => { if(HAS_GAS && !pending) load(); });
+window.addEventListener("offline", () => { if(HAS_GAS){ setSync("آفلاین؛ نسخه‌ی ذخیره‌شده نمایش داده می‌شود", "off"); syncBar(" می‌توانی داده‌های ذخیره‌شده را ببینی، ولی تغییرها در شیت ذخیره نمی‌شود.", "warn"); } });
+document.addEventListener("visibilitychange", () => { if(!document.hidden && HAS_GAS && !pending && Date.now() - lastLoadTry > 60000) load(); });
 
 /* ---------- computations ---------- */
 const doneOn = (k, hid) => (S.log[k]||[]).includes(hid);
