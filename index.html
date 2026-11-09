@@ -982,7 +982,7 @@ body.cook-theme{background:var(--bg);min-height:100vh}
 .sheet.fsheet{max-width:none;width:100%;height:100dvh;max-height:100dvh;border-radius:0;align-content:start;padding-top:max(14px,env(safe-area-inset-top))}
 .fsheet .jr-card{border:0;background:transparent!important;padding:0;gap:12px}
 .fsheet .jr-ta,.fsheet .kn-ta{min-height:45vh;font-size:15.5px}
-.rte{outline:none;white-space:pre-wrap;word-break:break-word;min-height:130px;font-size:14px;line-height:1.9;color:var(--ink);overflow:visible}
+.rte{-webkit-user-select:text;user-select:text;touch-action:manipulation;-webkit-tap-highlight-color:transparent;caret-color:var(--ink);outline:none;white-space:pre-wrap;word-break:break-word;min-height:130px;font-size:14px;line-height:1.9;color:var(--ink);overflow:visible}
 .rte:empty::before{content:attr(data-ph);color:var(--muted);pointer-events:none}
 .rte b{font-weight:800}.rte ul,.kn-card ul,.jr-pt ul{margin:4px 0;padding-inline-start:20px}
 .rte font[size="2"],.s-sm{font-size:.82em}.rte font[size="5"],.s-lg{font-size:1.3em;line-height:1.6}.rte font[size="6"],.s-xl{font-size:1.65em;line-height:1.5;font-weight:700}
@@ -1150,7 +1150,7 @@ body.has-fs #mic{bottom:84px}
           <h1 class="greet" id="greet">سلام!</h1>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <span class="ver" style="font-size:10px;color:var(--muted)">نسخه‌ی ۷٫۷</span><span class="sync" id="sync"><span class="dot"></span><span id="sync-t">در حال بارگذاری</span></span>
+          <span class="ver" style="font-size:10px;color:var(--muted)">نسخه‌ی ۷٫۸</span><span class="sync" id="sync"><span class="dot"></span><span id="sync-t">در حال بارگذاری</span></span>
           <button class="icon-btn" id="btn-settings" aria-label="تنظیمات"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
         </div>
       </header>
@@ -1513,7 +1513,7 @@ document.addEventListener("paste", ev => {
   ev.preventDefault(); const t = (ev.clipboardData || window.clipboardData).getData("text/plain"); document.execCommand("insertText", false, t);
 });
 
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const SR = null; /* میکروفون داخل پلنر خاموش است؛ از تایپ صوتی کیبورد استفاده می‌شود */
 let micRec = null, micOn = false, micTa = null, micTries = 0, micDone = 0, micLast = null;
 const MIC_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
 function micEl(){
@@ -1537,11 +1537,11 @@ function micStop(){
   micUi();
 }
 function micRun(){
-  const r = new SR(); micRec = r; micDone = 0;
-  r.lang = "fa-IR"; r.continuous = true; r.interimResults = false;
+  const r = new SR(); micRec = r; micDone = 0; let got = 0;
+  r.lang = "fa-IR"; r.continuous = false; r.interimResults = false; r.maxAlternatives = 1;
   r.onresult = ev => {
     if(!micTa || !micTa.isConnected){ micStop(); return; }
-    for(let i = micDone; i < ev.results.length; i++){ if(ev.results[i].isFinal){ micInsert(String(ev.results[i][0].transcript).trim()); micDone = i + 1; } }
+    for(let i = ev.resultIndex || 0; i < ev.results.length; i++){ if(ev.results[i].isFinal){ const t = String(ev.results[i][0].transcript).trim(); if(t){ micInsert(t); got++; } } }
   };
   r.onerror = ev => {
     const e = ev && ev.error;
@@ -1550,9 +1550,9 @@ function micRun(){
     else if(e === "audio-capture"){ micStop(); toast("میکروفون پیدا نشد"); }
   };
   r.onend = () => {
-    if(!micOn || micRec !== r) return;
-    if(!micTa || !micTa.isConnected || ++micTries > 25){ micStop(); return; }
-    micRun();
+    if(micRec !== r) return;
+    micOn = false; micRec = null; micUi();
+    if(!got) toast("چیزی نشنیدم؛ دوباره لمس کن و واضح‌تر بگو");
   };
   try{ r.start(); }catch(e){ micStop(); }
 }
@@ -1560,7 +1560,7 @@ function micToggle(){
   if(micOn){ micStop(); return; }
   const ae = document.activeElement, a = ae && (ae.tagName === "TEXTAREA" || (ae.classList && ae.classList.contains("rte"))) ? ae : (micLast && micLast.isConnected ? micLast : null); if(!a) return;
   try{ a.focus({preventScroll:true}); }catch(e){}
-  micTa = a; micOn = true; micTries = 0; micUi(); toast("در حال شنیدن… دوباره لمس کن تا تمام شود"); micRun();
+  micTa = a; micOn = true; micTries = 0; micUi(); toast("بگو… بعد از مکث، متن نوشته می‌شود"); micRun();
 }
 if(SR){
   document.addEventListener("focusin", ev => { if(ev.target && (ev.target.tagName === "TEXTAREA" || (ev.target.classList && ev.target.classList.contains("rte")))){ micLast = ev.target; micEl().hidden = false; micUi(); } });
@@ -1573,11 +1573,12 @@ if(SR){
   });
   document.addEventListener("visibilitychange", () => { if(document.hidden && micOn) micStop(); });
 }
-function growTa(el){ if(!el || el.id==="ki-t" || !el.offsetParent) return; el.style.height = "auto"; el.style.height = (el.scrollHeight + 2) + "px"; }
+function growTa(el, full){ if(!el || el.id==="ki-t" || !el.offsetParent) return; if(full || !el.style.height){ el.style.height = "auto"; el.style.height = (el.scrollHeight + 2) + "px"; } else if(el.scrollHeight > el.clientHeight + 1){ el.style.height = (el.scrollHeight + 2) + "px"; } }
+document.addEventListener("focusout", ev => { if(ev.target && ev.target.tagName === "TEXTAREA") growTa(ev.target, true); });
 function growAll(){ document.querySelectorAll("textarea").forEach(growTa); }
 document.addEventListener("input", ev => { if(ev.target && ev.target.tagName==="TEXTAREA") growTa(ev.target); });
 let growQ = 0;
-new MutationObserver(() => { if(growQ) return; growQ = requestAnimationFrame(() => { growQ = 0; growAll(); }); }).observe(document.body, {childList:true, subtree:true});
+new MutationObserver(ms => { if(growQ) return; let hit = false; for(const m of ms){ for(const n of m.addedNodes){ if(n.nodeType === 1 && (n.tagName === "TEXTAREA" || n.querySelector("textarea"))){ hit = true; break; } } if(hit) break; } if(!hit) return; growQ = requestAnimationFrame(() => { growQ = 0; growAll(); }); }).observe(document.body, {childList:true, subtree:true});
 window.addEventListener("resize", growAll);
 
 /* ---------- computations ---------- */
@@ -1857,11 +1858,32 @@ function openSettings(){
     <label class="field">نام تو<input type="text" id="sf-name" maxlength="40" value="${esc(S.name||"")}"></label>
     <div class="field">داده‌ها<div class="row" style="justify-content:flex-start">${S.url?`<a class="btn sec" style="text-decoration:none" href="${esc(S.url)}" target="_blank" rel="noopener">باز کردن گوگل شیت</a>`:`<span class="note">بعد از اتصال به شیت، لینکش اینجا می‌آید.</span>`}</div><span class="note">همه‌ی تیک‌ها، حال روزانه و خلاصه‌ی ماه‌ها در برگه‌های همان شیت ذخیره می‌شوند.</span></div>
     <div class="field">حافظه‌ی گوشی<span class="note" id="st-use">در حال محاسبه…</span></div>
+    <div class="field">جلد از اینترنت<div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" id="st-cov">${covNet()?"روشن است · لمس کن تا خاموش شود":"خاموش است · لمس کن تا روشن شود"}</button></div><span class="note">خاموش باشد، جلدها ساخته‌شده و آفلاین نشان داده می‌شوند و اینترنتی مصرف نمی‌شود. با Data Saver گوشی هم خودکار خاموش می‌شود.</span></div>
+    <div class="field">فضای Drive این پلنر<span class="note" id="dr-use">برای دیدن حجم، لمس کن.</span><div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" id="dr-go">محاسبه‌ی حجم</button><button class="btn sec" type="button" id="dr-clean" hidden>پاک‌سازی عکس‌های بی‌صاحب</button></div></div>
     ${STATIC?`<div class="field">اتصال<div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" data-apiset>تغییر اتصال به شیت</button></div></div>`:""}
     <div class="field">قفل اپ<div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" data-pinset>${pinSet()?"تغییر یا برداشتن رمز":"تنظیم رمز ۴ رقمی"}</button>${pinSet()?`<button class="btn sec" type="button" data-pinnow>قفل کن</button>`:""}</div><span class="note">فقط هنگام باز کردن اپ رمز می‌خواهد، نه برای تیک‌زدن عادت‌ها.</span></div>
     <div class="row"><button class="btn pri" type="submit">ذخیره</button><button class="btn sec" type="button" id="sf-cancel">بستن</button></div>
   </form></div>`;
   $("#sf-cancel").onclick = closeLayer;
+  $("#st-cov").onclick = () => { const on = covNet(); try{ localStorage.setItem("lifeos-covnet", on ? "0" : "1"); }catch(e){} $("#st-cov").textContent = covNet() ? "روشن است · لمس کن تا خاموش شود" : "خاموش است · لمس کن تا روشن شود"; render(); };
+  let drOrph = [];
+  const drFmt = n => n < 1048576 ? FA(Math.max(1, Math.round(n/1024))) + " کیلوبایت" : FA((n/1048576).toFixed(1)) + " مگابایت";
+  $("#dr-go").onclick = async () => {
+    const el = $("#dr-use"); el.textContent = "در حال محاسبه…";
+    try{
+      const st = await call("photoStats"), all = JSON.stringify(S), files = (st && st.files) || [];
+      drOrph = files.filter(x => all.indexOf(x.id) < 0);
+      const ob = drOrph.reduce((a,x) => a + x.size, 0);
+      el.textContent = `پوشه‌ی عکس‌ها: ${FA(files.length)} فایل، ${drFmt(st.bytes || 0)}. ${drOrph.length ? FA(drOrph.length) + " عکس به هیچ‌جا وصل نیست (" + drFmt(ob) + ")." : "همه‌ی عکس‌ها به جایی وصل‌اند."}`;
+      $("#dr-clean").hidden = !drOrph.length;
+    }catch(err){ el.textContent = "محاسبه ممکن نشد. اگر به‌تازگی نصب کرده‌ای، کد Code.gs را هم به‌روز کن."; }
+  };
+  $("#dr-clean").onclick = async () => {
+    const b = $("#dr-clean"); if(!b.dataset.sure){ b.dataset.sure = "1"; b.textContent = "مطمئنی؟ " + FA(drOrph.length) + " عکس به سطل زباله برود"; return; }
+    b.disabled = true; let ok = 0;
+    for(const x of drOrph){ try{ await call("deletePhoto", x.id); ok++; }catch(e){} }
+    $("#dr-use").textContent = FA(ok) + " عکس به سطل زباله‌ی Drive رفت (تا ۳۰ روز قابل بازگردانی است)."; b.hidden = true;
+  };
   try{ navigator.storage.estimate().then(e => { const el = $("#st-use"); if(el) el.textContent = `نسخه‌ی ذخیره‌شده‌ی اپ روی این دستگاه: حدود ${FA(Math.max(1, Math.round(JSON.stringify(S).length*2/1024)))} کیلوبایت. فضای آزاد مرورگر: حدود ${FA(Math.round((e.quota-e.usage)/1048576))} مگابایت.`; }).catch(() => { const el = $("#st-use"); if(el) el.textContent = ""; }); }catch(e){ const el = $("#st-use"); if(el) el.textContent = ""; }
   $("#sf").onsubmit = e => { e.preventDefault(); const old=S.name; S.name=$("#sf-name").value.trim(); closeLayer(); render(); toast("ذخیره شد"); sync("setName",[S.name],()=>{ S.name=old; }); };
 }
@@ -2003,6 +2025,7 @@ function sproutSVG(ratio, size){
 const ctTitle = t => String(t||"").split("(").join(" (").split("  ").join(" ").trim();
 const epT = s => { const n = String((s && s.note) || ""); if(n.charAt(0) !== "§") return ""; return n.slice(1).split("\n")[0].trim(); };
 const epN = s => { const n = String((s && s.note) || ""); if(n.charAt(0) !== "§") return n; const i = n.indexOf("\n"); return i < 0 ? "" : n.slice(i+1); };
+const covNet = () => { try{ if(localStorage.getItem("lifeos-covnet") === "0") return false; }catch(e){} try{ if(navigator.connection && navigator.connection.saveData) return false; }catch(e){} return true; };
 function coverHTML(b, cls=""){
   const p = prog(b), showRing = b.status==="reading" && p.total;
   const ring = showRing ? `<div class="cring">${ringSvg(p.pct,46,5,"rgba(255,255,255,.35)","#fff")}<b>${FA(Math.round(p.pct*100))}٪</b></div>` : "";
@@ -2015,7 +2038,7 @@ function coverHTML(b, cls=""){
     const cid = String(b.cover).slice(6), csz = String(cls).indexOf("lg")>=0 ? "full" : "thumb", cu = CVC[csz+":"+cid];
     return `<div class="cover ${cls}"><img data-cv="${esc(cid)}" data-sz="${csz}" alt="جلد ${esc(b.title)}" ${cu?`src="${cu}"`:""}>${ringX}${pod}</div>`;
   }
-  if(b.cover && String(b.cover).indexOf(HTTPS)===0) return `<div class="cover ${cls}"><img src="${esc(b.cover)}" alt="جلد ${esc(b.title)}" loading="lazy" referrerpolicy="no-referrer">${ringX}${pod}</div>`;
+  if(b.cover && String(b.cover).indexOf(HTTPS)===0 && covNet()) return `<div class="cover ${cls}"><img src="${esc(b.cover)}" alt="جلد ${esc(b.title)}" loading="lazy" referrerpolicy="no-referrer">${ringX}${pod}</div>`;
   const PL = (kd && KCOV[kd]) || COVERS, [bg,fg] = PL[hashStr(b.title||"") % PL.length];
   if(kd === "series") return `<div class="cover ${cls}" style="--cbg:${bg};--cfg:${fg}"><span class="kl2"></span><span class="kl1"></span><div class="kin"><div class="ct">${esc(ctTitle(b.title))}</div><div class="ca">${esc(b.author||"")}</div></div></div>`;
   if(kd) return `<div class="cover ${cls}" style="--cbg:${bg};--cfg:${fg}"><div class="kdeco" aria-hidden="true">${kd==="podcast"?"<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>":""}</div><div class="kin"><div class="ct">${esc(ctTitle(b.title))}</div><div class="ca">${esc(b.author||"")}</div></div></div>`;
@@ -2628,7 +2651,7 @@ function jrHTML(k){
     <div class="jr-top"><div class="jr-bgs" role="group" aria-label="رنگ زمینه">${Object.keys(JR_BG).map(c => `<button type="button" class="jr-sw ${c===d.bg?"on":""}" data-jrbg="${c}" style="background:${c?JR_BG[c]:"var(--surface)"}" aria-label="رنگ زمینه"></button>`).join("")}</div><span class="jr-s"></span></div>
     <div class="jr-items">${d.items.map(jrItemHTML).join("")}</div>
     <button type="button" class="jr-add" data-jradd>+ کار تیک‌دار</button>
-    <div class="jr-ta rte" contenteditable="true" data-ph="امروز چه گذشت؟ هرچه دلت خواست بنویس…">${rtHTML(d.text)}</div></div>`;
+    <div class="jr-ta rte" contenteditable="true" spellcheck="false" autocorrect="off" autocapitalize="off" enterkeyhint="enter" data-ph="امروز چه گذشت؟ هرچه دلت خواست بنویس…">${rtHTML(d.text)}</div></div>`;
 }
 function jrPrevHTML(k){
   const d = jrData(k), its = d.items.slice(0,4);
@@ -2974,7 +2997,7 @@ function openKn(n0){
       <div class="jr-top"><div class="jr-bgs" role="group" aria-label="رنگ زمینه">${Object.keys(JR_BG).map(c => `<button type="button" class="jr-sw ${c===color?"on":""}" data-knbg="${c}" style="background:${c?JR_BG[c]:"var(--surface)"}" aria-label="رنگ زمینه"></button>`).join("")}</div></div>
       <div class="jr-items" id="kn-items">${knItems(n).map(knItemHTML).join("")}</div>
       <button type="button" class="jr-add" data-knadd>+ مورد تیک‌دار</button>
-      <div class="kn-ta rte" id="kn-x" contenteditable="true" data-ph="متن نت…">${rtHTML(n.text)}</div></div>
+      <div class="kn-ta rte" id="kn-x" contenteditable="true" spellcheck="false" autocorrect="off" autocapitalize="off" enterkeyhint="enter" data-ph="متن نت…">${rtHTML(n.text)}</div></div>
     <label class="field">برچسب‌ها (با ویرگول جدا کن)<input type="text" id="kn-l" value="${esc(knLabels(n).join("، "))}" placeholder="مثلاً آشپزی، ایده"></label>
     <div class="cv-act"><button type="button" class="chip-btn alt" id="kn-pin" aria-pressed="${pinned}">سنجاق</button><button type="button" class="chip-btn alt" id="kn-ar" aria-pressed="${arch}">آرشیو</button></div>
     <span class="err" id="kn-err"></span>
@@ -3434,8 +3457,40 @@ function sheet(html){
   f.addEventListener("click", e => { const t=e.target.closest("button"); if(!t) return; if(t.dataset.dptoday) setDP(t.dataset.dptoday, todayStr()); if(t.dataset.dpclear) setDP(t.dataset.dpclear, ""); });
   f.querySelectorAll("[data-close]").forEach(x=>x.onclick=closeLayer);
   if(f.querySelector("textarea")){ f.classList.add("fsheet"); setTimeout(growAll, 60); }
+  try{ draftBind(f); }catch(e){}
   return f;
 }
+/* ---------- پیش‌نویس خودکار: اگر صفحه بسته شد، متن نوشته‌شده نمی‌پرد ---------- */
+let draftNow = null;
+function draftBind(f){
+  if(f.querySelector(".jr-ta") || !f.querySelector("textarea,.rte")) return;
+  const all = () => Array.prototype.slice.call(f.querySelectorAll("input[id],textarea[id],.rte[id]")).filter(e => e.type !== "file" && e.type !== "hidden" && e.type !== "password" && e.type !== "checkbox" && e.type !== "range");
+  const val = e => e.classList.contains("rte") ? rtVal(e) : e.value;
+  const snap = () => { const o = {}; all().forEach(e => { o[e.id] = val(e); }); return o; };
+  const base = snap(), txt = all().filter(e => e.type === "text" || e.type === "textarea" || e.classList.contains("rte")).map(e => base[e.id]).join("\u0001");
+  const h3 = f.querySelector("h3"), nt = f.querySelector(".note");
+  const key = "lifeos-draft:" + (h3 ? h3.textContent : "") + "|" + (nt ? nt.textContent : "") + "|" + hashStr(txt);
+  try{
+    const d = JSON.parse(localStorage.getItem(key) || "null");
+    if(d && d.v && Date.now() - d.t < 14*864e5){
+      let ch = 0;
+      all().forEach(e => { const v = d.v[e.id]; if(v == null || v === base[e.id]) return; ch++; if(e.classList.contains("rte")) e.innerHTML = rtHTML(v); else e.value = v; });
+      if(ch) setTimeout(() => toast("متن ذخیره‌نشده‌ی قبلی برگردانده شد"), 250);
+    }
+  }catch(e){}
+  const save = () => {
+    if(!f.isConnected) return;
+    try{ const cur = snap(); if(JSON.stringify(cur) === JSON.stringify(base)) localStorage.removeItem(key); else localStorage.setItem(key, JSON.stringify({t:Date.now(), v:cur})); }catch(e){}
+  };
+  const clear = () => { try{ localStorage.removeItem(key); }catch(e){} };
+  let tm = 0;
+  f.addEventListener("input", () => { clearTimeout(tm); tm = setTimeout(save, 300); });
+  f.addEventListener("submit", () => { setTimeout(() => { if(!f.isConnected) clear(); }, 120); });
+  f.querySelectorAll("[data-close]").forEach(x => x.addEventListener("click", clear));
+  draftNow = save;
+}
+document.addEventListener("visibilitychange", () => { if(document.hidden && draftNow) draftNow(); });
+window.addEventListener("pagehide", () => { if(draftNow) draftNow(); });
 
 /* ---------- ذخیره با همگام‌سازی ---------- */
 const ARR = {book:books, note:notes, session:sessions, chapter:chapters, mile:miles};
@@ -3460,6 +3515,7 @@ function openBook(b){
     <h3>${isNew?"افزودن تازه":"ویرایش"}</h3>
     <div class="stpick" id="bk-kind">${[["book","کتاب"],["podcast","پادکست"],["film","فیلم"],["series","سریال"]].map(([k,t])=>`<button type="button" data-k="${k}" aria-pressed="${k===kind}">${t}</button>`).join("")}</div>
     <div class="field" id="gb-box">جست‌وجوی خودکار (اسم کتاب، نویسنده یا شابک)<div class="row" style="flex-wrap:nowrap"><input type="text" id="gb-q" placeholder="اسم کتاب یا نویسنده" value="${esc(isNew?"":b.title)}" style="flex:1;min-width:0"><button type="button" class="btn sec" id="gb-go">جست‌وجو</button><button type="button" class="btn sec" id="gb-scan">اسکن</button><input type="file" id="gb-file" accept="image&#47;*" capture="environment" hidden></div><div id="gb-res" class="gb-res"></div></div>
+    <div class="field" id="ct-box" hidden><span id="ct-lbl">جست‌وجوی خودکار جلد</span><div class="row" style="flex-wrap:nowrap"><input type="text" id="ct-q" placeholder="اسم را (ترجیحاً انگلیسی) بنویس" value="${esc(isNew?"":b.title)}" style="flex:1;min-width:0"><button type="button" class="btn sec" id="ct-go">جست‌وجو</button></div><div id="ct-res" class="gb-res"></div><span class="note">فقط لینک عکس ذخیره می‌شود؛ هیچ فایلی به درایو نمی‌رود.</span></div>
     <label class="field">عنوان<input type="text" id="bk-title" maxlength="160" value="${esc(b.title)}"></label>
     <div class="two"><label class="field"><span id="lbl-author">${KC[kind].author}</span><input type="text" id="bk-author" maxlength="100" value="${esc(b.author||"")}"></label>
     <label class="field" id="fld-trans"><span id="lbl-trans">${KC[kind].trans}</span><input type="text" id="bk-trans" maxlength="100" value="${esc(b.translator||"")}"></label></div>
@@ -3519,7 +3575,7 @@ function openBook(b){
     $("#fld-trans").hidden = film; $("#fld-pages").hidden = film; $("#fld-daily").hidden = film;
     if($("#fld-cur")) $("#fld-cur").hidden = film;
     if($("#fld-end")) $("#fld-end").hidden = film;
-    $("#fld-pub").hidden = v!=="book"; $("#gb-box").hidden = v!=="book"; $("#fld-src").hidden = !scr;
+    $("#fld-pub").hidden = v!=="book"; $("#gb-box").hidden = v!=="book"; $("#ct-box").hidden = v==="book"; $("#fld-src").hidden = !scr;
     ["#fld-orig","#fld-place"].forEach(q => { const x = $(q); if(x) x.hidden = scr; });
     f.querySelectorAll("#bk-st button").forEach(y => { y.textContent = KSTAT(v)[y.dataset.st]; y.hidden = film && y.dataset.st==="reading"; });
     drawG(); est();
@@ -3542,6 +3598,20 @@ function openBook(b){
     }catch(err){ box.innerHTML = `<div class="note">جست‌وجو در دسترس نیست؛ مشخصات را دستی وارد کن.</div>`; }
   };
   $("#gb-go").onclick = doSearch;
+  const ctSearch = async () => {
+    const q = $("#ct-q").value.trim(), box = $("#ct-res"); if(!q) return;
+    box.innerHTML = '<div class="note">در حال جست‌وجو…</div>';
+    const ent = kind === "podcast" ? "podcast" : kind === "film" ? "movie" : "tvSeason";
+    try{
+      const r = await fetch(HTTPS + "itunes.apple.com/search?limit=8&media=" + (kind === "podcast" ? "podcast" : kind === "film" ? "movie" : "tvShow") + "&entity=" + ent + "&term=" + encodeURIComponent(q));
+      const j = await r.json(), res = (j.results || []).filter(x => x.artworkUrl100).map(x => ({title: x.collectionName || x.trackName || "", by: x.artistName || "", cover: String(x.artworkUrl100).split("100x100").join("300x300")}));
+      if(!res.length){ box.innerHTML = '<div class="note">چیزی پیدا نشد. اسم انگلیسی را امتحان کن یا لینک عکس را دستی بگذار.</div>'; return; }
+      box.innerHTML = res.map((r,i) => `<button type="button" class="gb-i" data-ci="${i}"><img src="${esc(r.cover)}" alt="" referrerpolicy="no-referrer" loading="lazy"><span><b>${esc(r.title)}</b><small>${esc(r.by)}</small></span></button>`).join("");
+      box.onclick = e => { const x = e.target.closest("[data-ci]"); if(!x) return; const r = res[+x.dataset.ci]; $("#bk-cover").value = r.cover; cvDrive = ""; drawCv(); if(!$("#bk-title").value.trim()) $("#bk-title").value = r.title; if(!$("#bk-author").value.trim() && r.by) $("#bk-author").value = r.by; box.innerHTML = '<div class="note">جلد انتخاب شد ✓ برای نگه‌داشتن، «ذخیره» را بزن.</div>'; };
+    }catch(err){ box.innerHTML = '<div class="note">جست‌وجو در دسترس نیست (آفلاین؟). لینک عکس را دستی بگذار.</div>'; }
+  };
+  $("#ct-go").onclick = ctSearch;
+  $("#ct-q").onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); ctSearch(); } };
   const scanBtn = $("#gb-scan"), scanFile = $("#gb-file");
   scanBtn.onclick = () => {
     if(!("BarcodeDetector" in window)){ $("#gb-res").innerHTML = `<div class="note">اسکن بارکد روی این دستگاه پشتیبانی نمی‌شود. شابک پشت کتاب را بالا تایپ کن.</div>`; return; }
@@ -3569,7 +3639,7 @@ function openBook(b){
     const fl = inp.files && inp.files[0]; if(!fl) return;
     const note = $("#cv-note"); note.textContent = "در حال آماده‌سازی تصویر…"; $("#bk-err").textContent = "";
     try{
-      const b64 = await kxResize(fl, 600, 0.78);
+      const b64 = await kxResize(fl, 420, 0.7);
       note.textContent = "در حال ذخیره در Drive…";
       const id = await call("savePhoto", b64, "cook");
       const fullU = "data:image/jpeg;base64," + b64, thU = await cvShrink(fullU, 240, 0.72);
