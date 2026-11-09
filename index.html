@@ -259,6 +259,7 @@ input[type=range]{width:100%;accent-color:var(--sage)}
 .cover .cl{width:28px;height:2px;background:currentColor;opacity:.6;margin-top:10px;position:relative}
 .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .cover.lg{width:150px;flex:none}
+.cover img.cnet{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;z-index:1}
 .cover.k-podcast,.cover.k-series,.cover.k-film{box-shadow:0 10px 20px -14px rgba(0,0,0,.5)}
 .cover.k-podcast::after,.cover.k-series::after,.cover.k-film::after{content:none}
 .cover.k-podcast{aspect-ratio:1/1;border-radius:22px;padding:0;background:linear-gradient(135deg,var(--cbg),color-mix(in srgb,var(--cbg) 55%,#000))}
@@ -1150,7 +1151,7 @@ body.has-fs #mic{bottom:84px}
           <h1 class="greet" id="greet">سلام!</h1>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <span class="ver" style="font-size:10px;color:var(--muted)">نسخه‌ی ۷٫۸</span><span class="sync" id="sync"><span class="dot"></span><span id="sync-t">در حال بارگذاری</span></span>
+          <span class="ver" style="font-size:10px;color:var(--muted)">نسخه‌ی ۷٫۹</span><span class="sync" id="sync"><span class="dot"></span><span id="sync-t">در حال بارگذاری</span></span>
           <button class="icon-btn" id="btn-settings" aria-label="تنظیمات"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
         </div>
       </header>
@@ -1859,6 +1860,7 @@ function openSettings(){
     <div class="field">داده‌ها<div class="row" style="justify-content:flex-start">${S.url?`<a class="btn sec" style="text-decoration:none" href="${esc(S.url)}" target="_blank" rel="noopener">باز کردن گوگل شیت</a>`:`<span class="note">بعد از اتصال به شیت، لینکش اینجا می‌آید.</span>`}</div><span class="note">همه‌ی تیک‌ها، حال روزانه و خلاصه‌ی ماه‌ها در برگه‌های همان شیت ذخیره می‌شوند.</span></div>
     <div class="field">حافظه‌ی گوشی<span class="note" id="st-use">در حال محاسبه…</span></div>
     <div class="field">جلد از اینترنت<div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" id="st-cov">${covNet()?"روشن است · لمس کن تا خاموش شود":"خاموش است · لمس کن تا روشن شود"}</button></div><span class="note">خاموش باشد، جلدها ساخته‌شده و آفلاین نشان داده می‌شوند و اینترنتی مصرف نمی‌شود. با Data Saver گوشی هم خودکار خاموش می‌شود.</span></div>
+    <div class="field">کم‌حجم‌سازی خودکار جلد<div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" id="st-shr">${(()=>{try{return localStorage.getItem("lifeos-shrink")==="0"}catch(e){return false}})()?"خاموش است · لمس کن تا روشن شود":"روشن است · لمس کن تا خاموش شود"}</button></div><span class="note">عکس‌های بزرگ لینکی، از طریق سرویس رایگان wsrv.nl کوچک (حدود ۱۰ تا ۲۰ کیلوبایت) و بعد نمایش داده می‌شوند. فقط آدرس عکس به آن سرویس می‌رود، نه اطلاعات دیگر تو.</span></div>
     <div class="field">فضای Drive این پلنر<span class="note" id="dr-use">برای دیدن حجم، لمس کن.</span><div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" id="dr-go">محاسبه‌ی حجم</button><button class="btn sec" type="button" id="dr-clean" hidden>پاک‌سازی عکس‌های بی‌صاحب</button></div></div>
     ${STATIC?`<div class="field">اتصال<div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" data-apiset>تغییر اتصال به شیت</button></div></div>`:""}
     <div class="field">قفل اپ<div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" data-pinset>${pinSet()?"تغییر یا برداشتن رمز":"تنظیم رمز ۴ رقمی"}</button>${pinSet()?`<button class="btn sec" type="button" data-pinnow>قفل کن</button>`:""}</div><span class="note">فقط هنگام باز کردن اپ رمز می‌خواهد، نه برای تیک‌زدن عادت‌ها.</span></div>
@@ -1866,6 +1868,7 @@ function openSettings(){
   </form></div>`;
   $("#sf-cancel").onclick = closeLayer;
   $("#st-cov").onclick = () => { const on = covNet(); try{ localStorage.setItem("lifeos-covnet", on ? "0" : "1"); }catch(e){} $("#st-cov").textContent = covNet() ? "روشن است · لمس کن تا خاموش شود" : "خاموش است · لمس کن تا روشن شود"; render(); };
+  $("#st-shr").onclick = () => { let off = false; try{ off = localStorage.getItem("lifeos-shrink") === "0"; localStorage.setItem("lifeos-shrink", off ? "1" : "0"); }catch(e){} $("#st-shr").textContent = off ? "روشن است · لمس کن تا خاموش شود" : "خاموش است · لمس کن تا روشن شود"; render(); };
   let drOrph = [];
   const drFmt = n => n < 1048576 ? FA(Math.max(1, Math.round(n/1024))) + " کیلوبایت" : FA((n/1048576).toFixed(1)) + " مگابایت";
   $("#dr-go").onclick = async () => {
@@ -2026,6 +2029,13 @@ const ctTitle = t => String(t||"").split("(").join(" (").split("  ").join(" ").t
 const epT = s => { const n = String((s && s.note) || ""); if(n.charAt(0) !== "§") return ""; return n.slice(1).split("\n")[0].trim(); };
 const epN = s => { const n = String((s && s.note) || ""); if(n.charAt(0) !== "§") return n; const i = n.indexOf("\n"); return i < 0 ? "" : n.slice(i+1); };
 const covNet = () => { try{ if(localStorage.getItem("lifeos-covnet") === "0") return false; }catch(e){} try{ if(navigator.connection && navigator.connection.saveData) return false; }catch(e){} return true; };
+const SMALL_HOSTS = ["mzstatic.com", "books.google", "googleusercontent.com", "covers.openlibrary.org", "wsrv.nl"];
+function netUrl(u, w){
+  u = String(u||""); if(!u || u.indexOf("wsrv.nl") >= 0) return u;
+  try{ if(localStorage.getItem("lifeos-shrink") === "0") return u; }catch(e){}
+  return HTTPS + "wsrv.nl/?url=" + encodeURIComponent(u) + "&w=" + w + "&h=" + Math.round(w*1.5) + "&fit=cover&output=webp&q=70";
+}
+window.addEventListener("error", ev => { const t = ev.target; if(t && t.tagName === "IMG" && t.dataset && t.dataset.net){ if(t.dataset.orig && t.dataset.tried !== "1"){ t.dataset.tried = "1"; t.src = t.dataset.orig; } else t.remove(); } }, true);
 function coverHTML(b, cls=""){
   const p = prog(b), showRing = b.status==="reading" && p.total;
   const ring = showRing ? `<div class="cring">${ringSvg(p.pct,46,5,"rgba(255,255,255,.35)","#fff")}<b>${FA(Math.round(p.pct*100))}٪</b></div>` : "";
@@ -2038,7 +2048,10 @@ function coverHTML(b, cls=""){
     const cid = String(b.cover).slice(6), csz = String(cls).indexOf("lg")>=0 ? "full" : "thumb", cu = CVC[csz+":"+cid];
     return `<div class="cover ${cls}"><img data-cv="${esc(cid)}" data-sz="${csz}" alt="جلد ${esc(b.title)}" ${cu?`src="${cu}"`:""}>${ringX}${pod}</div>`;
   }
-  if(b.cover && String(b.cover).indexOf(HTTPS)===0 && covNet()) return `<div class="cover ${cls}"><img src="${esc(b.cover)}" alt="جلد ${esc(b.title)}" loading="lazy" referrerpolicy="no-referrer">${ringX}${pod}</div>`;
+  if(b.cover && String(b.cover).indexOf(HTTPS)===0 && covNet() && !b.__nocov){
+    const g = coverHTML(Object.assign({}, b, {__nocov:true}), cls), i = g.lastIndexOf("</div>");
+    return g.slice(0, i) + `<img class="cnet" data-net="1" data-orig="${esc(b.cover)}" data-nu="${esc(b.cover)}" data-w="${String(cls).indexOf("lg")>=0 ? 360 : 240}" alt="" referrerpolicy="no-referrer"${CVC["net:"+b.cover] ? ` src="${CVC["net:"+b.cover]}"` : ""}>` + g.slice(i);
+  }
   const PL = (kd && KCOV[kd]) || COVERS, [bg,fg] = PL[hashStr(b.title||"") % PL.length];
   if(kd === "series") return `<div class="cover ${cls}" style="--cbg:${bg};--cfg:${fg}"><span class="kl2"></span><span class="kl1"></span><div class="kin"><div class="ct">${esc(ctTitle(b.title))}</div><div class="ca">${esc(b.author||"")}</div></div></div>`;
   if(kd) return `<div class="cover ${cls}" style="--cbg:${bg};--cfg:${fg}"><div class="kdeco" aria-hidden="true">${kd==="podcast"?"<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>":""}</div><div class="kin"><div class="ct">${esc(ctTitle(b.title))}</div><div class="ca">${esc(b.author||"")}</div></div></div>`;
@@ -2358,7 +2371,7 @@ function renderWatch(el){
 }
 
 /* ---------- تصویر جلد: حافظه‌ی دائمی، بارگذاری تنبل (۶٫۷) ---------- */
-const CVC = {}, CVMAX = 400;
+const CVC = {}, CVMAX = 1500;
 let cvDbP = null, cvPuts = 0, cvActive = 0;
 const cvQ = [], cvBusy = {};
 function cvOpen(){
@@ -2401,6 +2414,7 @@ function cvPump(){
   }
 }
 function cvLoad(im){
+  if(im.dataset.nu) return cvNetLoad(im);
   const id = im.dataset.cv, sz = im.dataset.sz || "thumb", key = sz+":"+id;
   if(CVC[key]){ im.src = CVC[key]; return; }
   cvGet(key).then(rec => {
@@ -2410,7 +2424,26 @@ function cvLoad(im){
   });
 }
 const cvObs = ("IntersectionObserver" in window) ? new IntersectionObserver(es => { es.forEach(e => { if(e.isIntersecting){ cvObs.unobserve(e.target); cvLoad(e.target); } }); }, {rootMargin:"300px"}) : null;
+function cvNetApply(nu, u){ document.querySelectorAll("img.cnet[data-nu]").forEach(x => { if(x.dataset.nu === nu) x.src = u; }); }
+function cvNetLoad(im){
+  const nu = im.dataset.nu, key = "net:" + nu, w = +im.dataset.w || 240;
+  if(CVC[key]){ im.src = CVC[key]; return; }
+  cvGet(key).then(rec => {
+    if(rec && rec.v){ CVC[key] = rec.v; cvNetApply(nu, rec.v); return; }
+    if(!navigator.onLine || !covNet()) return;
+    if(cvBusy[key]) return; cvBusy[key] = 1;
+    fetch(netUrl(nu, w)).then(r => { if(!r.ok) throw 0; return r.blob(); }).then(bl => new Promise((res, rej) => { if(bl.size > 400000){ rej(0); return; } const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(bl); }))
+      .then(u => { CVC[key] = u; cvPut(key, u); cvNetApply(nu, u); })
+      .catch(() => { im.src = netUrl(nu, w); })
+      .then(() => { delete cvBusy[key]; });
+  });
+}
 function cvHydrate(){
+  document.querySelectorAll("img.cnet[data-nu]:not([data-obs])").forEach(im => {
+    im.dataset.obs = "1";
+    if(im.getAttribute("src")) return;
+    if(cvObs) cvObs.observe(im); else cvNetLoad(im);
+  });
   document.querySelectorAll("img[data-cv]:not([data-obs])").forEach(im => {
     im.dataset.obs = "1";
     const key = (im.dataset.sz || "thumb")+":"+im.dataset.cv;
@@ -3490,6 +3523,35 @@ function draftBind(f){
   draftNow = save;
 }
 document.addEventListener("visibilitychange", () => { if(document.hidden && draftNow) draftNow(); });
+/* ---------- دکمه‌ی بازگشت گوشی/مرورگر: یک مرحله به عقب، نه خروج از برنامه ---------- */
+let navDepth = 0, navQuiet = 0;
+function navWant(){
+  let d = 0;
+  try{ if($("#layer") && $("#layer").children.length) d++; }catch(e){}
+  try{ if(view === "lib" && libBook) d++; }catch(e){}
+  try{ if(view !== "habits") d++; }catch(e){}
+  return d;
+}
+function navSync(){
+  if(navQuiet) return;
+  const w = navWant();
+  try{
+    if(w > navDepth){ while(navDepth < w){ history.pushState({lo:navDepth+1}, ""); navDepth++; } }
+    else if(w < navDepth){ const n = navDepth - w; navDepth = w; navQuiet++; history.go(-n); setTimeout(() => { navQuiet = Math.max(0, navQuiet-1); }, 350); }
+  }catch(e){}
+}
+window.addEventListener("popstate", () => {
+  if(navQuiet){ return; }
+  if(navDepth > 0) navDepth--;
+  const hadLayer = !!($("#layer") && $("#layer").children.length);
+  if(hadLayer){ closeLayer(); }
+  else if(view === "lib" && libBook){ libBook = null; renderLib(); }
+  else if(view !== "habits"){ setView("habits"); window.scrollTo({top:0}); }
+  setTimeout(navSync, 0);
+});
+document.addEventListener("click", () => { setTimeout(navSync, 0); setTimeout(navSync, 400); }, false);
+try{ new MutationObserver(() => { setTimeout(navSync, 0); }).observe($("#layer"), {childList:true}); }catch(e){}
+
 window.addEventListener("pagehide", () => { if(draftNow) draftNow(); });
 
 /* ---------- ذخیره با همگام‌سازی ---------- */
@@ -3630,7 +3692,7 @@ function openBook(b){
   const drawCv = () => {
     const pv = $("#cv-prev"), link = $("#bk-cover").value.trim();
     if(cvDrive) pv.innerHTML = `<img data-cv="${esc(cvDrive)}" data-sz="thumb" alt="" ${CVC["thumb:"+cvDrive]?`src="${CVC["thumb:"+cvDrive]}"`:""}>`;
-    else if(link.indexOf(HTTPS)===0) pv.innerHTML = `<img src="${esc(link)}" alt="" referrerpolicy="no-referrer">`;
+    else if(link.indexOf(HTTPS)===0){ pv.innerHTML = `<img data-net="1" data-orig="${esc(link)}" src="${esc(netUrl(link, 240))}" alt="" referrerpolicy="no-referrer">`; const im = pv.querySelector("img"); $("#cv-note").textContent = "یا لینک تصویر را این‌جا بگذار:"; im.addEventListener("error", () => { if(im.dataset.tried !== "1" && im.dataset.orig !== im.src) return; pv.innerHTML = '<svg class="i" viewBox="0 0 24 24" style="width:22px;height:22px"><path d="M4 5h16v14H4zM4 16l4-4 4 4 3-3 5 5"/></svg>'; $("#cv-note").textContent = "این لینک عکس نیست (شاید لینک صفحه است). روی خود عکس نگه دار و «باز کردن عکس در تب جدید» را بزن، بعد آدرس همان تب را بگذار."; }); }
     else pv.innerHTML = `<svg class="i" viewBox="0 0 24 24" style="width:22px;height:22px"><path d="M4 5h16v14H4zM4 16l4-4 4 4 3-3 5 5"/></svg>`;
     $("#cv-clear").hidden = !(cvDrive || link);
     cvHydrate();
