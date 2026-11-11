@@ -371,6 +371,23 @@ input[type=range]{width:100%;accent-color:var(--sage)}
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 12px;font-size:12px;color:var(--muted)}
 .chip.on{background:var(--sage-tint);border-color:var(--sage);color:var(--sage-strong);font-weight:700}
 .chip-sep{width:1px;height:18px;background:var(--line);margin-inline:4px}
+.mood button[aria-pressed="true"][data-c="g"]{background:rgba(111,144,104,.28);border-color:#8DB085;color:var(--ink)}
+.mood button[aria-pressed="true"][data-c="w"]{background:rgba(217,178,126,.34);border-color:#D9B27E;color:var(--ink)}
+.mood button[aria-pressed="true"][data-c="b"]{background:rgba(143,167,204,.30);border-color:#8FA7CC;color:var(--ink)}
+.mood button[aria-pressed="true"][data-c="p"]{background:rgba(183,155,199,.30);border-color:#B79BC7;color:var(--ink)}
+.mood button[aria-pressed="true"][data-c="r"]{background:rgba(212,154,149,.30);border-color:#D49A95;color:var(--ink)}
+.mood button[aria-pressed="true"][data-c="n"]{background:var(--sage-tint);border-color:var(--sage);color:var(--ink)}
+.mood button:disabled{opacity:.38}
+.hrow{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:6px 0;font-size:13px}
+.hbar{height:7px;background:var(--line);border-radius:7px;overflow:hidden;margin:4px 0 6px}.hbar i{display:block;height:100%;background:var(--sage)}
+.hpill{display:inline-block;justify-self:start;background:var(--sage-tint);color:var(--sage-strong);border-radius:999px;padding:2px 10px;font-weight:700;font-size:11.5px}
+.hpill.w{background:#F6E6D2;color:#8a5a1d}
+.gs-g{font-size:11.5px;font-weight:700;color:var(--muted);margin:12px 0 6px;display:flex;justify-content:space-between}
+.gs-r{display:block;width:100%;text-align:start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin-bottom:6px;font-size:13px;color:var(--ink)}
+.gs-r small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.gs-r mark{background:#F6E6B8;color:#3a2f10;border-radius:3px;padding:0 2px}
+.bk-warn{background:#F6E6D2;color:#6b4a1b;border-radius:12px;padding:8px 12px;font-size:12.5px}
+
 .cring{position:absolute;inset-inline-end:8px;bottom:8px;width:46px;height:46px;display:grid;place-items:center;background:rgba(0,0,0,.18);border-radius:50%;backdrop-filter:blur(2px)}
 .cring svg{position:absolute;inset:0}
 .cring b{font-size:11px;color:#fff;position:relative}
@@ -1151,7 +1168,8 @@ body.has-fs #mic{bottom:84px}
           <h1 class="greet" id="greet">سلام!</h1>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <span class="ver" style="font-size:10px;color:var(--muted)">نسخه‌ی ۷٫۹</span><span class="sync" id="sync"><span class="dot"></span><span id="sync-t">در حال بارگذاری</span></span>
+          <span class="ver" style="font-size:10px;color:var(--muted)">نسخه‌ی ۸٫۰</span><span class="sync" id="sync"><span class="dot"></span><span id="sync-t">در حال بارگذاری</span></span>
+          <button class="icon-btn" id="btn-search" aria-label="جست‌وجو در همه‌جا"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
           <button class="icon-btn" id="btn-settings" aria-label="تنظیمات"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
         </div>
       </header>
@@ -1818,6 +1836,7 @@ $("#d-prev").onclick = () => { if(viewIdx>CAL.ti-60){ viewIdx--; render(); } };
 $("#d-next").onclick = () => { if(viewIdx<CAL.ti){ viewIdx++; render(); } };
 $("#hm-habit").onchange = renderHeat;
 $("#btn-settings").onclick = openSettings;
+$("#btn-search").onclick = openSearch;
 
 function closeLayer(){ jrFlush(); $("#layer").innerHTML=""; try{ if(!calBack && !knBack){ renderJrHome(); } }catch(e){} if(calBack){ calBack = false; openCalFull(); } else if(knBack){ knBack = false; openKnAll(); } }
 function openHabit(h){
@@ -1858,6 +1877,10 @@ function openSettings(){
     <h3>تنظیمات</h3>
     <label class="field">نام تو<input type="text" id="sf-name" maxlength="40" value="${esc(S.name||"")}"></label>
     <div class="field">داده‌ها<div class="row" style="justify-content:flex-start">${S.url?`<a class="btn sec" style="text-decoration:none" href="${esc(S.url)}" target="_blank" rel="noopener">باز کردن گوگل شیت</a>`:`<span class="note">بعد از اتصال به شیت، لینکش اینجا می‌آید.</span>`}</div><span class="note">همه‌ی تیک‌ها، حال روزانه و خلاصه‌ی ماه‌ها در برگه‌های همان شیت ذخیره می‌شوند.</span></div>
+    ${(bkDays() < 0 || bkDays() > 60) ? `<div class="bk-warn">${bkDays() < 0 ? "هنوز پشتیبان فایل نگرفته‌ای." : "از آخرین پشتیبان " + FA(bkDays()) + " روز گذشته."} پیشنهاد می‌کنم الان یکی بگیری.</div>` : ""}
+    <div class="field">پشتیبان‌گیری<span class="note" id="bk-t">${bkText()} یک فایل متنی از همه‌ی اطلاعات؛ فقط روی گوشی خودت، بدون حجم در Drive.</span><div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" id="bk-dl">دانلود فایل پشتیبان</button><button class="btn sec" type="button" id="bk-sh">فرستادن / ذخیره در Drive</button></div></div>
+    <div class="field">سلامت داده‌ها<div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" id="hl-open">دیدن وضعیت</button></div></div>
+    <div class="field">برچسب‌های حال‌وهوا<div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" id="md-open">ویرایش اسم برچسب‌ها</button></div></div>
     <div class="field">حافظه‌ی گوشی<span class="note" id="st-use">در حال محاسبه…</span></div>
     <div class="field">جلد از اینترنت<div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" id="st-cov">${covNet()?"روشن است · لمس کن تا خاموش شود":"خاموش است · لمس کن تا روشن شود"}</button></div><span class="note">خاموش باشد، جلدها ساخته‌شده و آفلاین نشان داده می‌شوند و اینترنتی مصرف نمی‌شود. با Data Saver گوشی هم خودکار خاموش می‌شود.</span></div>
     <div class="field">کم‌حجم‌سازی خودکار جلد<div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" id="st-shr">${(()=>{try{return localStorage.getItem("lifeos-shrink")==="0"}catch(e){return false}})()?"خاموش است · لمس کن تا روشن شود":"روشن است · لمس کن تا خاموش شود"}</button></div><span class="note">عکس‌های بزرگ لینکی، از طریق سرویس رایگان wsrv.nl کوچک (حدود ۱۰ تا ۲۰ کیلوبایت) و بعد نمایش داده می‌شوند. فقط آدرس عکس به آن سرویس می‌رود، نه اطلاعات دیگر تو.</span></div>
@@ -1867,6 +1890,10 @@ function openSettings(){
     <div class="row"><button class="btn pri" type="submit">ذخیره</button><button class="btn sec" type="button" id="sf-cancel">بستن</button></div>
   </form></div>`;
   $("#sf-cancel").onclick = closeLayer;
+  $("#bk-dl").onclick = () => { bkDownload(); const w = document.querySelector(".bk-warn"); if(w) w.remove(); $("#bk-t").textContent = "فایل دانلود شد. " + bkText(); };
+  $("#bk-sh").onclick = async () => { const ok = await bkShare(); if(ok) $("#bk-t").textContent = bkText(); else { bkDownload(); $("#bk-t").textContent = "اشتراک‌گذاری در این مرورگر ممکن نبود؛ فایل دانلود شد. " + bkText(); } };
+  $("#hl-open").onclick = openHealth;
+  $("#md-open").onclick = openMoodEdit;
   $("#st-cov").onclick = () => { const on = covNet(); try{ localStorage.setItem("lifeos-covnet", on ? "0" : "1"); }catch(e){} $("#st-cov").textContent = covNet() ? "روشن است · لمس کن تا خاموش شود" : "خاموش است · لمس کن تا روشن شود"; render(); };
   $("#st-shr").onclick = () => { let off = false; try{ off = localStorage.getItem("lifeos-shrink") === "0"; localStorage.setItem("lifeos-shrink", off ? "1" : "0"); }catch(e){} $("#st-shr").textContent = off ? "روشن است · لمس کن تا خاموش شود" : "خاموش است · لمس کن تا روشن شود"; render(); };
   let drOrph = [];
@@ -1895,7 +1922,7 @@ function openSettings(){
 /* ================= کتابخانه‌ی من — نسخه‌ی ۲ ================= */
 let libGenre = "", libPub = "", libAuthor = "", libSort = "def";
 let sessShow = {};
-let view = "habits", libTab = "shelf", libFilter = "all", libKind = "all", libShelf = "", libQuery = "", libBook = null, wrapYear = CAL.year;
+let view = "habits", libTab = "shelf", libFilter = "all", libKind = "all", libShelf = "", libQuery = "", libMood = "", libBook = null, wrapYear = CAL.year;
 const STATUS = {reading:"در حال خواندن", done:"خوانده‌شده", want:"می‌خواهم بخوانم", paused:"نیمه‌کاره"};
 const STATUS_P = {reading:"در حال گوش دادن", done:"شنیده‌شده", want:"می‌خواهم گوش کنم", paused:"نیمه‌کاره"};
 const STATUS_ORDER = {reading:0, done:1, paused:2, want:3};
@@ -1924,6 +1951,142 @@ const todayStr = () => CAL.days[CAL.ti].key;
 const fmtT = t => { const j=jOf(t); return `${FA(j.d)} ${MONTHS[j.m-1]} ${FA(j.y)}`; };
 
 /* داده‌ها */
+
+/* ================= برچسب‌های حال‌وهوا ================= */
+const MOOD0 = [["hk","حال‌خوب‌کن","g"],["ar","آرام‌بخش","g"],["en","انگیزه‌بخش","w"],["el","الهام‌بخش","w"],["fk","فکربرانگیز","b"],["am","آموزنده","b"],["gi","گیرا","p"],["kh","خوش‌خوان","p"],["tl","تلخ","r"],["gh","غمگین","r"],["sb","سبک","g"],["dv","دوباره می‌روم سراغش","b"]];
+const MOOD_MAX = 3, MOOD_ALL = 20;
+function moodX(){ try{ const x = JSON.parse(prefs().moodx || "{}") || {}; return {r:x.r||{}, a:Array.isArray(x.a)?x.a:[]}; }catch(e){ return {r:{}, a:[]}; } }
+function moodDefs(kind){
+  const x = moodX();
+  const base = MOOD0.map(m => ({id:m[0], c:m[2], d:m[1], name: x.r[m[0]] || (m[0]==="kh" ? (kind==="film"||kind==="series" ? "خوش‌دیدن" : kind==="podcast" ? "خوش‌شنو" : "خوش‌خوان") : m[1])}));
+  return base.concat(x.a.map(a => ({id:a[0], c:"n", d:a[1], name: x.r[a[0]] || a[1]})));
+}
+const moodsOf = b => String(b.tags||"").split("،").join(",").split(",").map(x=>x.trim()).filter(x=>x.charAt(0)==="~" && x.length>1).map(x=>x.slice(1));
+const moodName = (id, kind) => { const m = moodDefs(kind).find(z => z.id===id); return m ? m.name : ""; };
+function moodBar(){
+  const used = new Set(); books().forEach(b => moodsOf(b).forEach(i => used.add(i)));
+  if(!used.size) return "";
+  const defs = moodDefs(libKind).filter(m => used.has(m.id));
+  return `<div class="chips"><span class="note" style="margin:0">حال‌وهوا:</span>${defs.map(m => `<button class="chip ${libMood===m.id?"on":""}" data-lmood="${m.id}">${esc(m.name)}</button>`).join("")}</div>`;
+}
+document.addEventListener("click", e => {
+  const x = e.target.closest("[data-lmood]"); if(!x) return;
+  libMood = libMood===x.dataset.lmood ? "" : x.dataset.lmood;
+  const body = $("#libbody"); if(body) renderShelfTab(body);
+});
+function openMoodEdit(){
+  const defs = moodDefs("book"), x0 = moodX();
+  $("#layer").innerHTML = `<div class="backdrop" id="bd"><form class="sheet" id="md-f"><h3>برچسب‌های حال‌وهوا</h3>
+    <div class="note">اسم هر برچسب را می‌توانی عوض کنی؛ مورد‌هایی که قبلاً زده‌ای خراب نمی‌شوند. حداکثر ${FA(MOOD_ALL)} برچسب.</div>
+    ${defs.map(m => `<label class="field">${esc(m.d)}<input type="text" data-mid="${m.id}" maxlength="24" value="${esc(m.name)}"></label>`).join("")}
+    ${defs.length < MOOD_ALL ? `<label class="field">برچسب تازه (اختیاری)<input type="text" id="md-new" maxlength="24" placeholder="مثلاً: برای شب‌های بارانی"></label>` : ""}
+    <div class="row"><button class="btn pri" type="submit">ذخیره</button><button class="btn sec" type="button" id="md-x">بستن</button></div></form></div>`;
+  $("#md-x").onclick = closeLayer;
+  $("#md-f").onsubmit = e => {
+    e.preventDefault();
+    const r = {}, a = x0.a.slice();
+    defs.forEach(m => { const el = document.querySelector('[data-mid="' + m.id + '"]'); const v = el ? el.value.trim() : ""; const dflt = MOOD0.find(z => z[0]===m.id); const base = dflt ? (m.id==="kh" ? "" : dflt[1]) : m.d; if(v && v !== base && !(m.id==="kh" && (v==="خوش‌خوان"||v==="خوش‌دیدن"||v==="خوش‌شنو"))) r[m.id] = v; });
+    const nw = $("#md-new") ? $("#md-new").value.trim() : "";
+    if(nw && defs.length < MOOD_ALL) a.push(["u" + Date.now().toString(36).slice(-5), nw]);
+    const old = S.prefs; S.prefs = {...prefs(), moodx: JSON.stringify({r:r, a:a})};
+    sync("setPref", ["moodx", S.prefs.moodx], () => { S.prefs = old; });
+    closeLayer(); toast("برچسب‌ها ذخیره شد"); if(view==="lib") renderLib();
+  };
+}
+
+/* ================= پشتیبان‌گیری ================= */
+function bkLast(){ try{ return localStorage.getItem("lifeos-lastbk") || ""; }catch(e){ return ""; } }
+function bkDays(){ const t = Date.parse(bkLast()); return isNaN(t) ? -1 : Math.floor((Date.now() - t) / 86400000); }
+function bkText(){ const d = bkDays(); return d < 0 ? "هنوز پشتیبان فایل نگرفته‌ای." : d === 0 ? "آخرین پشتیبان: امروز" : "آخرین پشتیبان: " + FA(d) + " روز پیش"; }
+function bkJSON(){ return JSON.stringify({app:"lifeos", schema:1, version:"8.0", date:new Date().toISOString(), data:S}); }
+function bkName(){ return "lifeos-" + todayStr() + ".json"; }
+function bkMark(){ try{ localStorage.setItem("lifeos-lastbk", new Date().toISOString()); }catch(e){} }
+function bkDownload(){
+  const blob = new Blob([bkJSON()], {type:"application/json"}), a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = bkName(); document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); bkMark();
+}
+async function bkShare(){
+  try{
+    const f = new File([bkJSON()], bkName(), {type:"application/json"});
+    if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title:"پشتیبان Life OS"}); bkMark(); return true; }
+  }catch(e){ if(e && e.name==="AbortError") return true; }
+  return false;
+}
+
+/* ================= جست‌وجوی سراسری ================= */
+const gsN = t => String(t||"").split("ي").join("ی").split("ك").join("ک").split("‌").join(" ").split("ـ").join("").toLowerCase();
+const gsD = t => String(t).split("").map(c => "0123456789".indexOf(c) >= 0 ? "۰۱۲۳۴۵۶۷۸۹".charAt("0123456789".indexOf(c)) : c).join("");
+function gsIndex(){
+  const out = [], bt = id => { const b = books().find(z => z.id===id); return b ? b.title : ""; };
+  books().forEach(b => out.push({g:"کتابخانه", id:b.id, act:"book", t:b.title, x:[b.author, b.translator, b.summary, b.shelves, tagsOf(b).join(" ")].join(" "), sub:({book:"کتاب",podcast:"پادکست",film:"فیلم",series:"سریال"})[b.kind||"book"] || "کتاب"}));
+  notes().forEach(n => out.push({g:"یادداشت و جمله‌ی کتاب‌ها", id:n.bookId, act:"book", t:"", x:rtPlain(n.text) + " " + (n.why||""), sub:bt(n.bookId)}));
+  sessions().forEach(z => out.push({g:"جلسه‌ها", id:z.bookId, act:"book", t:epT(z), x:epN(z), sub:bt(z.bookId) + " · " + gsD(z.date)}));
+  knotes().forEach(n => out.push({g:"نت‌ها", id:n.id, act:"kn", t:n.title||"", x:rtPlain(n.text) + " " + knItems(n).map(i => i.t).join(" ") + " " + knLabels(n).join(" "), sub:"نت"}));
+  journals().forEach(j => out.push({g:"دفترچه‌ی روزانه", id:j.date, act:"jr", t:"", x:rtPlain(j.text) + " " + knItems(j).map(i => i.t).join(" "), sub:"دفترچه · " + gsD(j.date)}));
+  return out.filter(r => (r.t + r.x).trim());
+}
+function gsSnip(txt, q){
+  const t = String(txt||"").split("\n").join(" "), n = gsN(t), i = n.indexOf(q); if(i < 0) return esc(t.slice(0, 70));
+  const a = Math.max(0, i - 25), b = Math.min(t.length, i + q.length + 45);
+  return (a > 0 ? "… " : "") + esc(t.slice(a, i)) + "<mark>" + esc(t.slice(i, i + q.length)) + "</mark>" + esc(t.slice(i + q.length, b)) + (b < t.length ? " …" : "");
+}
+function openSearch(){
+  $("#layer").innerHTML = `<div class="backdrop" id="bd"><form class="sheet fsheet" id="gs-f" onsubmit="return false"><div class="fs-head"><h3>جست‌وجو در همه‌جا</h3><button type="button" class="btn pri" data-close>بستن</button></div>
+    <label class="field" style="margin:0"><input type="search" id="gs-q" placeholder="یک کلمه بنویس (حداقل ۲ حرف)" autocomplete="off"></label><div id="gs-res" class="note">در یادداشت‌ها، دفترچه، کتابخانه و جلسه‌ها می‌گردد.</div></form></div>`;
+  $("#gs-f").querySelectorAll("[data-close]").forEach(x => x.onclick = closeLayer);
+  let idx = null, tm = 0;
+  const run = () => {
+    const q = gsN($("#gs-q").value).trim(), el = $("#gs-res");
+    if(q.length < 2){ el.className = "note"; el.textContent = "در یادداشت‌ها، دفترچه، کتابخانه و جلسه‌ها می‌گردد."; return; }
+    if(!idx) idx = gsIndex();
+    const hits = idx.filter(r => gsN(r.t + " " + r.x).indexOf(q) >= 0), groups = {};
+    hits.forEach(r => { (groups[r.g] = groups[r.g] || []).push(r); });
+    el.className = "";
+    if(!hits.length){ el.className = "note"; el.textContent = "چیزی پیدا نشد."; return; }
+    el.innerHTML = Object.keys(groups).map(g => { const L = groups[g];
+      return `<div class="gs-g"><span>${g}</span><span>${FA(L.length)}</span></div>` + L.slice(0, 8).map(r => {
+        const main = r.t && gsN(r.t).indexOf(q) >= 0 ? gsSnip(r.t, q) : (r.t ? esc(r.t) : gsSnip(r.x, q));
+        return `<button type="button" class="gs-r" data-gs="${r.act}|${esc(r.id)}">${main}<small>${esc(r.sub||"")}${r.t && gsN(r.t).indexOf(q) < 0 && gsN(r.x).indexOf(q) >= 0 ? " · " + gsSnip(r.x, q) : ""}</small></button>`; }).join("") + (L.length > 8 ? `<div class="note">و ${FA(L.length - 8)} نتیجه‌ی دیگر؛ کلمه را دقیق‌تر کن.</div>` : ""); }).join("");
+  };
+  $("#gs-q").oninput = () => { clearTimeout(tm); tm = setTimeout(run, 200); };
+  $("#gs-res").onclick = e => {
+    const b = e.target.closest("[data-gs]"); if(!b) return;
+    const k = b.dataset.gs.split("|"), id = k.slice(1).join("|");
+    closeLayer();
+    if(k[0]==="book"){ libBook = id; if(view!=="lib") setView("lib"); else renderLib(); window.scrollTo({top:0}); }
+    else if(k[0]==="kn"){ const n = knotes().find(z => z.id===id); if(n) openKn(n); }
+    else if(k[0]==="jr"){ openJrFull(id); }
+  };
+  setTimeout(() => { const q = $("#gs-q"); if(q) q.focus(); }, 40);
+}
+
+/* ================= سلامت داده‌ها ================= */
+const HNAME = {prefs:"تنظیمات", habits:"عادت‌ها", log:"ثبت روزانه‌ی عادت‌ها", mood:"حال‌وهوا", books:"کتابخانه", bnotes:"یادداشت و جمله‌ی کتاب‌ها", sessions:"جلسه‌ها", journals:"دفترچه‌ی روزانه", knotes:"نت‌ها", tx:"تراکنش‌ها", budgets:"بودجه", fgoals:"هدف‌های مالی", cycles:"چرخه", stickers:"استیکرها", dishes:"آشپزی", runs:"آشپزی (اجراها)", plans:"برنامه‌ها", csteps:"آشپزی (مرحله‌ها)", chapters:"فصل‌های زندگی", miles:"نقطه‌های عطف", events:"رویدادها", paused:"عادت‌های متوقف", heirs:"مهارت‌ها", map:"نقشه"};
+function openHealth(){
+  const kb = n => n < 1048576 ? FA(Math.max(1, Math.round(n/1024))) + " کیلوبایت" : FA((n/1048576).toFixed(1)) + " مگابایت";
+  const rows = Object.keys(S).filter(k => S[k] && typeof S[k]==="object").map(k => { let n = 0, sz = 0; try{ sz = JSON.stringify(S[k]).length; }catch(e){} n = Array.isArray(S[k]) ? S[k].length : Object.keys(S[k]).length; return {k:k, n:n, sz:sz}; }).sort((a,b) => b.sz - a.sz);
+  let total = 0; try{ total = JSON.stringify(S).length; }catch(e){}
+  const big = rows.filter(r => r.n > 5000), st = total > 5242880 || big.length ? "w" : "";
+  $("#layer").innerHTML = `<div class="backdrop" id="bd"><form class="sheet" id="hl-f"><h3>سلامت داده‌ها</h3>
+    <div class="field">وضعیت کلی <span class="hpill ${st}">${st ? "کمی بزرگ شده؛ مراقب باش" : "سالم"}</span>
+      <div class="hrow"><span>حجم اطلاعات برنامه</span><b>${kb(total)}</b></div>
+      <div class="hbar"><i style="width:${Math.min(100, Math.round(total/5242880*100))}%"></i></div>
+      <span class="note">تا حدود ۵ مگابایت برای باز شدن سریع مشکلی نیست. این حد تخمین من است و بعد از چند ماه دوباره بررسی‌اش می‌کنیم.</span></div>
+    <div class="field">بزرگ‌ترین بخش‌ها${rows.slice(0, 8).map(r => `<div class="hrow"><span>${HNAME[r.k] || esc(r.k)}</span><span>${FA(r.n)} مورد · ${kb(r.sz)}</span></div>`).join("")}
+      ${big.length ? `<span class="note">بخشی از ۵٬۰۰۰ مورد بیشتر شده؛ پیشنهاد می‌کنم سال‌های قدیمی را آرشیو کنیم.</span>` : `<span class="note">هیچ بخشی به حد هشدار (حدود ۵٬۰۰۰ مورد) نزدیک نیست.</span>`}</div>
+    <div class="field">عکس‌های Drive<span class="note" id="hl-dr">برای شمردن، لمس کن.</span><div class="row" style="justify-content:flex-start"><button class="btn sec" type="button" id="hl-go">شمردن عکس‌ها</button></div></div>
+    <div class="field">پشتیبان<span class="note">${bkText()}</span></div>
+    <div class="row"><button class="btn sec" type="button" id="hl-x">بستن</button></div></form></div>`;
+  $("#hl-x").onclick = closeLayer;
+  $("#hl-go").onclick = async () => {
+    const el = $("#hl-dr"); el.textContent = "در حال شمردن…";
+    try{ const r = await call("photoStats"), f = (r && r.files) || [], all = JSON.stringify(S), o = f.filter(x => all.indexOf(x.id) < 0);
+      el.textContent = FA(f.length) + " فایل، " + kb(r.bytes || 0) + (o.length ? " · " + FA(o.length) + " عکس بی‌صاحب (در تنظیمات می‌توانی پاک‌سازی کنی)." : " · همه به چیزی وصل‌اند."); }
+    catch(err){ el.textContent = "شمردن ممکن نشد."; }
+  };
+}
+
 const books = () => S.books || (S.books = []);
 const notes = () => S.bnotes || (S.bnotes = []);
 const sessions = () => S.sessions || (S.sessions = []);
@@ -1944,7 +2107,7 @@ const sessOf = id => sessions().filter(s=>s.bookId===id).sort((a,b)=>sortable(b.
 const chapterOf = b => chapters().find(c => c.id===b.chapter || (b.chapter && c.title===b.chapter));
 const chapterName = b => { const c = chapterOf(b); return c ? c.title : (b.chapter||""); };
 const DEFAULT_GENRES = ["رمان","داستان کوتاه","تاریخی","روان‌شناسی","توسعه‌ی فردی","فلسفه","شعر","علمی","زندگی‌نامه","اقتصاد","هنر","عاشقانه","کودک و نوجوان"];
-const tagsOf = b => String(b.tags||"").split("،").join(",").split(",").map(x=>x.trim()).filter(Boolean);
+const tagsOf = b => String(b.tags||"").split("،").join(",").split(",").map(x=>x.trim()).filter(x=>x && x.charAt(0)!=="~");
 const shelvesOf = b => String(b.shelves||"").split("،").join(",").split(",").map(s=>s.trim()).filter(Boolean);
 function prog(b){ const total=num(b.pages), cur=Math.min(num(b.current), total||num(b.current)); return {total, cur, left:Math.max(0,total-cur), pct: total ? Math.min(1, cur/total) : 0}; }
 function rangeText(b){
@@ -3258,6 +3421,7 @@ function renderShelfTab(el){
       ${[["all","همه"],["book","کتاب"],["podcast","پادکست"],["film","فیلم"],["series","سریال"]].map(([k,t])=>`<button class="chip ${libKind===k?"on":""}" data-lk="${k}">${t}</button>`).join("")}
       ${shelves.length?`<span class="chip-sep"></span>`:""}${shelves.map(s=>`<button class="chip ${libShelf===s?"on":""}" data-lsh="${esc(s)}">${esc(s)}</button>`).join("")}
     </div>
+    ${moodBar()}
     ${filterBox()}
     <div class="books" id="shelf"></div>`;
   ["genre","pub","author","sort"].forEach(k=>{ const x=$("#lf-"+k); if(x) x.onchange = e => { const v=e.target.value; if(k==="genre") libGenre=v; else if(k==="pub") libPub=v; else if(k==="author") libAuthor=v; else libSort=v; const c=$("#lf-clear"); if(c) c.hidden = !(libGenre||libPub||libAuthor||libSort!=="def"); renderShelf(); }; });
@@ -3279,7 +3443,7 @@ function filterBox(){
 function renderShelf(){
   const q = libQuery.trim(), shelf = $("#shelf"); if(!shelf) return;
   const list = books().filter(b => (libFilter==="all" || b.status===libFilter) && (libKind==="all" || (b.kind||"book")===libKind) &&
-    (!libShelf || shelvesOf(b).includes(libShelf)) && (!libGenre || tagsOf(b).includes(libGenre)) && (!libPub || String(b.publisher||"").trim()===libPub) && (!libAuthor || String(b.author||"").trim()===libAuthor) &&
+    (!libShelf || shelvesOf(b).includes(libShelf)) && (!libMood || moodsOf(b).includes(libMood)) && (!libGenre || tagsOf(b).includes(libGenre)) && (!libPub || String(b.publisher||"").trim()===libPub) && (!libAuthor || String(b.author||"").trim()===libAuthor) &&
     (!q || [b.title,b.author,b.translator,b.tags,b.shelves,chapterName(b)].join(" ").includes(q)))
     .sort((a,b) => libSort==="new" ? (sortable(b.end||b.start)-sortable(a.end||a.start))
       : libSort==="rate" ? (num(b.rating)-num(a.rating))
@@ -3572,7 +3736,7 @@ function readingHabitId(){ const h = prefs().readHabit; if(h==="none") return ""
 function openBook(b){
   const isNew = !b;
   b = b ? {...b} : {id:bid("b"), kind:(libKind==="podcast"||libKind==="film"||libKind==="series")?libKind:"book", title:"", author:"", translator:"", status:"want", start:"", end:"", rating:"", tags:"", chapter:"", cover:"", summary:"", apply:"", pages:"", current:"", shelves:"", letter:"", recBy:"", origin:"", place:"", publisher:"", daily:""};
-  let st = b.status || "want", rate = num(b.rating), kind = b.kind || "book", genres = tagsOf(b);
+  let st = b.status || "want", rate = num(b.rating), kind = b.kind || "book", genres = tagsOf(b), moods = moodsOf(b);
   const f = sheet(`
     <h3>${isNew?"افزودن تازه":"ویرایش"}</h3>
     <div class="stpick" id="bk-kind">${[["book","کتاب"],["podcast","پادکست"],["film","فیلم"],["series","سریال"]].map(([k,t])=>`<button type="button" data-k="${k}" aria-pressed="${k===kind}">${t}</button>`).join("")}</div>
@@ -3595,6 +3759,7 @@ function openBook(b){
     <label class="field">قفسه‌های شخصی (با ویرگول جدا کن)<input type="text" id="bk-shelves" maxlength="160" value="${esc(b.shelves||"")}" placeholder="کتاب‌هایی که زندگی‌ام را عوض کردند، برای روزهای سخت"></label>
     <div class="field">ژانر (هر چند تا می‌خواهی انتخاب کن)<div class="stpick" id="bk-genres"></div>
       <div class="row" style="flex-wrap:nowrap"><input type="text" id="bk-gnew" maxlength="30" placeholder="ژانر دیگر را بنویس" style="flex:1;min-width:0"><button type="button" class="btn sec" id="bk-gadd">افزودن</button></div></div>
+    <div class="field">حال‌وهوا (حداکثر ${FA(MOOD_MAX)}) <span class="note" id="md-n" style="display:inline"></span><div class="stpick mood" id="bk-moods"></div></div>
     ${isNew?"":`<details class="more" ${b.recBy||b.origin||b.place?"open":""}><summary id="sm-mem">${KC[kind].mem}</summary>
       <label class="field">چه کسی معرفی کرد<input type="text" id="bk-rec" maxlength="100" value="${esc(b.recBy||"")}"></label>
       <div class="field" id="fld-orig">از کجا آمد<div class="stpick" id="bk-orig">${ORIGINS.map(o=>`<button type="button" data-o="${o}" aria-pressed="${o===b.origin}">${o}</button>`).join("")}</div></div>
@@ -3646,6 +3811,9 @@ function openBook(b){
   $("#bk-genres").onclick = e => { const x = e.target.closest("button"); if(!x) return; const g = x.dataset.g; genres = genres.includes(g) ? genres.filter(y => y!==g) : [...genres, g]; drawG(); };
   const addG = () => { const el = $("#bk-gnew"), v = el.value.trim(); if(!v) return; if(!genres.includes(v)) genres = [...genres, v]; el.value = ""; drawG(); };
   $("#bk-gadd").onclick = addG;
+  const drawM = () => { const full = moods.length >= MOOD_MAX; $("#bk-moods").innerHTML = moodDefs(kind).map(m => `<button type="button" data-m="${m.id}" data-c="${m.c}" aria-pressed="${moods.includes(m.id)}" ${full && !moods.includes(m.id) ? "disabled" : ""}>${esc(m.name)}</button>`).join(""); $("#md-n").textContent = moods.length ? "· " + FA(moods.length) + " از " + FA(MOOD_MAX) : ""; };
+  $("#bk-moods").onclick = e => { const x = e.target.closest("button"); if(!x || x.disabled) return; const g = x.dataset.m; moods = moods.includes(g) ? moods.filter(y => y!==g) : (moods.length < MOOD_MAX ? [...moods, g] : moods); drawM(); };
+  $("#bk-kind").addEventListener("click", () => { setTimeout(drawM, 0); }); drawM();
   $("#bk-gnew").onkeydown = e => { if(e.key==="Enter"){ e.preventDefault(); addG(); } };
   const doSearch = async () => {
     const q = $("#gb-q").value.trim(), box = $("#gb-res"); if(!q) return;
@@ -3746,7 +3914,7 @@ function openBook(b){
     const cover = cvDrive ? "drive:" + cvDrive : $("#bk-cover").value.trim();
     cvNew.concat(cvOld ? [cvOld] : []).forEach(id => { if(id && id!==cvDrive) call("deletePhoto", id).catch(() => {}); });
     Object.assign(b, {kind, title, author:$("#bk-author").value.trim(), translator:$("#bk-trans").value.trim(), status:st, start, end,
-      rating: rate?String(rate):"", tags:genres.join("، "), shelves:$("#bk-shelves").value.trim(), chapter: isNew ? "" : $("#bk-ch").value,
+      rating: rate?String(rate):"", tags:genres.concat(moods.map(z => "~" + z)).join("، "), shelves:$("#bk-shelves").value.trim(), chapter: isNew ? "" : $("#bk-ch").value,
       pages: pages?String(pages):"", publisher: $("#bk-pub").value.trim(), daily: daily?String(daily):"", current: (st==="done" && pages) ? String(pages) : (cur?String(cur):""),
       recBy: isNew ? "" : $("#bk-rec").value.trim(), origin: (kind==="film"||kind==="series") ? "" : origin, place: (kind==="film"||kind==="series") ? ($("#bk-src").value ? "src:"+$("#bk-src").value : "") : (isNew ? "" : $("#bk-place").value.trim()), cover: (String(cover).indexOf(HTTPS)===0 || String(cover).indexOf("drive:")===0) ? cover : ""});
     if(kind==="film"){ b.pages = ""; b.current = ""; b.daily = ""; b.translator = ""; b.publisher = ""; }
